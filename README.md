@@ -29,7 +29,7 @@ deploy/publish-github.ps1            一条命令上线
 ### 一、GitHub Pages（本仓库已备好，最省事）
 
 ```powershell
-pwsh deploy/publish-github.ps1
+powershell -NoProfile -File deploy\publish-github.ps1
 ```
 
 脚本会做四件事：初始化仓库并提交、在 GitHub 上建仓库并推送、把 Pages 切到 Actions 构建、打印站点地址。

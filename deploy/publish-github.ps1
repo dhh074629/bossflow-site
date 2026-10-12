@@ -1,7 +1,7 @@
-# 一条命令上线到 GitHub Pages。
+﻿# 一条命令上线到 GitHub Pages。
 # 用法：
-#   pwsh deploy/publish-github.ps1                  # 用默认仓库名 bossflow，公开
-#   pwsh deploy/publish-github.ps1 -Repo mysite     # 换个仓库名
+#   powershell -NoProfile -File deploy\publish-github.ps1              # 默认仓库名 bossflow-site
+#   powershell -NoProfile -File deploy\publish-github.ps1 -Repo mysite # 换个仓库名
 #
 # 前提：本机 gh 已登录（gh auth status 能通过），且账号有 repo + workflow 权限。
 
