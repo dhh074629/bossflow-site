@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BossFlow —— 让 DeepSeek 当老板，指挥 Codex 干活</title>
+<meta name="description" content="一个零依赖的编排层：DeepSeek 负责拆解、派活、验收、汇报，Codex 命令行负责动手，中间夹一个提示词优化器保证每张施工单都可验收。">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="#top">Boss<span>Flow</span></a>
+    <nav>
+      <a href="#how">怎么运转</a>
+      <a href="#optimizer">提示词优化器</a>
+      <a href="#proof">实测结果</a>
+      <a href="#start">上手</a>
+      <a href="#hosting">托管方案</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero wrap">
+    <p class="eyebrow">零依赖 · 本地可跑 · 凭据复用</p>
+    <h1>让 DeepSeek 当老板，<br>指挥 Codex 干活</h1>
+    <p class="lede">
+      老板负责拆解、派活、验收、汇报；Codex 命令行负责真正动手。
+      中间夹一个提示词优化器：施工单在派出去之前先过体检，改不好就丢弃，绝不把含糊的活丢给工人去猜。
+    </p>
+    <div class="cta">
+      <a class="btn primary" href="#start">三条命令上手</a>
+      <a class="btn" href="#proof">看一次真实运行</a>
+    </div>
+    <ul class="chips">
+      <li>零 npm 依赖，只有 Node 标准库</li>
+      <li>自动复用 Codex 已配好的 DeepSeek 凭据</li>
+      <li>不通过就打回重做</li>
+      <li>全过程留证据</li>
+    </ul>
+  </section>
+
+  <section class="wrap band">
+    <h2>为什么需要这一层</h2>
+    <div class="two">
+      <div class="card bad">
+        <h3>直接把一句话丢给执行型 agent</h3>
+        <ul>
+          <li>工人不知道要交出什么、怎么算做完，于是自己猜</li>
+          <li>猜错了你还得重来一遍，返工比第一次做还贵</li>
+          <li>工人说"我做完了"，你就得自己逐条核对</li>
+        </ul>
+      </div>
+      <div class="card good">
+        <h3>把这两件事变成机器的职责</h3>
+        <ul>
+          <li>施工单派出去之前先体检 + 改写，达标才发车</li>
+          <li>交活之后由老板逐条对照验收标准判定</li>
+          <li>不通过就产出返工说明，自动重做一轮</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="how" class="wrap band">
+    <h2>怎么运转</h2>
+    <div class="flow">
+      <div class="node">
+        <span class="tag">你</span>
+        <h3>一句话目标</h3>
+        <p>"给提示词优化器补一套单元测试"</p>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="node accent">
+        <span class="tag">老板 · DeepSeek</span>
+        <h3>拆解 → 派活 → 验收</h3>
+        <ul>
+          <li><b>planner</b> 拆成带依赖关系的任务，每个写清产出物 / 验收标准 / 边界 / 交付格式</li>
+          <li><b>promptopt</b> 施工单七维体检，不及格就改写，改差了丢弃</li>
+          <li><b>verifier</b> 对照验收标准判定，不通过就产出返工说明</li>
+        </ul>
+      </div>
+      <div class="arrow">↓ 自包含、可验收的施工单</div>
+      <div class="node">
+        <span class="tag">工人 · codex exec</span>
+        <h3>在指定工作区动手</h3>
+        <p>可并发执行；证据 = 退出码 + 最后一条消息 + 完整事件流 + 改动文件清单</p>
+      </div>
+      <div class="arrow">↓ 证据</div>
+      <div class="node">
+        <span class="tag">运行目录</span>
+        <h3>拆解 / 施工单 / 证据 / 验收结论 / report.md</h3>
+        <p>老板和工人看过的每一步都留在磁盘上，可以事后逐条复查</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="optimizer" class="wrap band">
+    <h2>提示词优化器</h2>
+    <p class="sub">分三级，先便宜后贵，从不无脑烧 token。</p>
+    <div class="grid3">
+      <div class="card">
+        <h3>第一级 · 规则体检</h3>
+        <p>零成本、毫秒级，七个维度打分。这一级永远先跑。</p>
+      </div>
+      <div class="card">
+        <h3>第二级 · 模型改写</h3>
+        <p>分数低于达标线才叫模型改写；改完重新体检，分数没涨就丢弃，最多两轮。</p>
+      </div>
+      <div class="card">
+        <h3>第三级 · 学习闭环</h3>
+        <p>第一次就通过验收的施工单会存进 library.jsonl，之后改写会参考它们。</p>
+      </div>
+    </div>
+    <table class="score">
+      <thead>
+        <tr><th>维度</th><th>权重</th><th>判什么</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>产出物</td><td>18</td><td>有没有说清最终要交出什么</td></tr>
+        <tr><td>验收标准</td><td>22</td><td>有没有可机械验证的判据</td></tr>
+        <tr><td>自包含</td><td>14</td><td>有没有"上面那个""之前说的"这类指向对话的指代</td></tr>
+        <tr><td>边界</td><td>12</td><td>有没有明确禁止项</td></tr>
+        <tr><td>输出格式</td><td>12</td><td>交付形状与命名是否指定</td></tr>
+        <tr><td>具体度</td><td>12</td><td>有没有具体路径、命令、数量级</td></tr>
+        <tr><td>无含糊</td><td>10</td><td>"尽量""酌情"这类词会扣分</td></tr>
+      </tbody>
+    </table>
+    <div class="beforeafter">
+      <div>
+        <span class="tag">原稿 · 24 分</span>
+        <pre><code>把项目里没用的代码清理一下</code></pre>
+        <p class="muted">缺产出物、缺验收标准、缺边界、缺交付格式</p>
+      </div>
+      <div class="arrow2">→</div>
+      <div>
+        <span class="tag good">改写后 · 97 分</span>
+        <pre><code>任务：清理 <span class="hl">src/</span> 下无引用的死代码
+产出物：<span class="hl">reports/dead-code.md</span>
+验收：<span class="hl">npm test 退出码为 0</span>
+边界：不删除被动态引用的模块，不改 package.json
+交付格式：Markdown，每条附文件路径与行号</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <section id="proof" class="wrap band">
+    <h2>一次真实运行</h2>
+    <p class="sub">没有演示数据：老板是真实的 deepseek-v4-pro，工人是真实的 codex exec。</p>
+    <div class="stats">
+      <div class="stat"><b>5</b><span>子任务</span></div>
+      <div class="stat"><b>3</b><span>执行波次</span></div>
+      <div class="stat"><b>0</b><span>非零退出码</span></div>
+      <div class="stat"><b>16</b><span>测试全过</span></div>
+    </div>
+    <div class="two">
+      <div class="card">
+        <h3>老板怎么拆的</h3>
+        <ol class="steps">
+          <li>先探查模块接口，产出接口说明</li>
+          <li>三个测试文件并行编写（评分 / 问题识别 / 改写不劣化）</li>
+          <li>最后集成运行，把退出码清零</li>
+        </ol>
+        <p class="muted">token 消耗：prompt 8580 / completion 19000</p>
+      </div>
+      <div class="card">
+        <h3>老板顺手挑出的毛病</h3>
+        <p>它的验收笔记里主动指出"验收基于工人书面声明，建议抽查文件源码"，还发现了评分函数里一个真实计分 bug：二元维度缺失时仍给满分。</p>
+        <p class="muted">那个 bug 已修；工人写的测试断言的是性质而非写死的分数，修复后 16 个测试依然全过。</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="start" class="wrap band">
+    <h2>上手</h2>
+    <div class="codeblock">
+      <button class="copy" type="button" data-copy="cmd1">复制</button>
+      <pre id="cmd1"><code>cd outputs/bossflow
+node src/cli.mjs doctor                             # 体检，确认凭据来源
+node src/cli.mjs plan "你的目标"                      # 先看拆解，不花工人时间
+node src/cli.mjs run "你的目标" --workspace &lt;仓库&gt;    # 干真活</code></pre>
+    </div>
+    <p class="muted">想看成品施工单而不烧 token，加 <code>--dry-run</code>；想在没有 key 的机器上演示，加 <code>--mock</code>。</p>
+  </section>
+
+  <section id="hosting" class="wrap band">
+    <h2>托管方案</h2>
+    <p class="sub">这个站是纯静态、零依赖的，放哪家都能托管。按你的取舍选：</p>
+    <table class="hosting">
+      <thead>
+        <tr><th>方案</th><th>适合</th><th>成本</th><th>国内访问</th><th>自动部署</th><th>备案</th></tr>
+      </thead>
+      <tbody>
+        <tr class="pick">
+          <td><b>Cloudflare Pages</b></td><td>静态站首选</td><td>免费</td><td>一般</td><td>Git 推送即部署</td><td>不需要</td>
+        </tr>
+        <tr><td>GitHub Pages</td><td>已有仓库</td><td>免费</td><td>一般</td><td>附带的 workflow 直接可用</td><td>不需要</td></tr>
+        <tr><td>Vercel</td><td>静态站 / 前端</td><td>免费额度</td><td>一般</td><td>Git 推送即部署</td><td>不需要</td></tr>
+        <tr><td>阿里云 OSS + CDN</td><td>国内速度优先</td><td>几元/月起</td><td>好</td><td>需自接 CI</td><td>绑域名需备案</td></tr>
+        <tr><td>腾讯云轻量 + Coolify</td><td>还要跑控制台 / 后端</td><td>约 50 元/月起</td><td>好</td><td>面板一键部署</td><td>绑域名需备案</td></tr>
+      </tbody>
+    </table>
+    <p class="muted">
+      纯静态站在中国大陆用域名提供 HTTP 服务需要 ICP 备案；只按 IP 访问可以绕开，但没法用 HTTPS 域名。
+      如果你以后要的是"在浏览器里点按钮派活、看运行记录"的控制台，那就得有一台常驻服务器来跑 BossFlow，
+      这时自托管 PaaS 面板（Coolify / Dokploy，都是几万 star 的开源项目）比自己手搓 Docker 省事得多。
+    </p>
+  </section>
+</main>
+
+<footer class="wrap">
+  <p>BossFlow · 站点生成于 2026-10-12 · 数据来自本机真实运行记录</p>
+</footer>
+<script src="app.js"></script>
+</body>
+</html>
