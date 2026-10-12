@@ -6,7 +6,7 @@
 # 前提：本机 gh 已登录（gh auth status 能通过），且账号有 repo + workflow 权限。
 
 param(
-  [string]$Repo = "bossflow",
+  [string]$Repo = "bossflow-site",
   [string]$Branch = "main"
 )
 

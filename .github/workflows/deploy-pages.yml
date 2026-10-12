@@ -16,6 +16,9 @@ concurrency:
 
 jobs:
   deploy:
+    # GitHub Pages 在免费账号上只能服务公开仓库，所以私有期间这个任务自动跳过，
+    # 免得留下一堆失败记录；仓库转公开后它就会正常部署。
+    if: github.event.repository.visibility == 'public'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
